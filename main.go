@@ -24,13 +24,13 @@ func main() {
 	password := flag.String("password", "", "DSL modem password")
 	flag.Parse()
 
-	numstats := []string{"Uptime", "SNRDS", "SNRUS", "AttDS", "AttDS", "PwrDS", "PwrUS", "AttainableDS", "AttainableUS", "RateDS", "RateUS"}
-	statsRe := regexp.MustCompile(`.*?>Synchronized Time:</td><td colspan="2">(?P<Uptime>.+?)\&nbsp;</td>` +
+	numstats := []string{"Uptime", "SNRDS", "SNRUS", "AttDS", "AttUS", "PwrDS", "PwrUS", "AttainableDS", "AttainableUS", "RateDS", "RateUS"}
+	statsRe := regexp.MustCompile(`(?s).*?>Synchronized Time:</td><td colspan="2">(?P<Uptime>.+?)\&nbsp;</td>` +
 		`.*?>SNR Margin \(0\.1 dB\):</td><td>(?P<SNRDS>.+?)</td><td>(?P<SNRUS>.+?)</td>` +
 		`.*?>Attenuation \(0\.1 dB\):</td><td>(?P<AttDS>.+?)</td><td>(?P<AttUS>.+?)</td>` +
 		`.*?>Output Power \(0\.1 dBm\):</td><td>(?P<PwrDS>.+?)</td><td>(?P<PwrUS>.+?)</td>` +
-		`.*?><nobreak>Attainable Rate \(Kbps\):</nobreak></td><td>(?P<AttainableDS>.+?)</td><td>(?P<AttainableUS>.+?)</td>`)
-	//`.*?>Rate \(Kbps\):</td><td>(?P<RateDS>.+?)</td><td>(?P<RateUS>.+?)</td>`)
+		`.*?><nobreak>Attainable Rate \(Kbps\):</nobreak></td><td>(?P<AttainableDS>.+?)</td><td>(?P<AttainableUS>.+?)</td>`+
+		`.*?>Rate \(Kbps\):</td><td>(?P<RateDS>.+?)</td><td>(?P<RateUS>.+?)</td>`)
 	uptimeRe := regexp.MustCompile(`(?P<days>\d+) (?P<hours>\d+):(?P<minutes>\d+):(?P<seconds>\d+)`)
 
 	// log in
@@ -104,8 +104,10 @@ func main() {
 			parseInt64(seconds)*int64(time.Second))
 	}
 
+	fieldset = append(fieldset, fmt.Sprintf("uptime=%.0f", uptime.Seconds()))
+
 	// print influxdb line protocl
-	fmt.Printf("dsl,host=%s uptime=%.0f,%s\n", *host, uptime.Seconds(), strings.Join(fieldset, ","))
+	fmt.Printf("dsl,host=%s %s\n", *host, strings.Join(fieldset, ","))
 }
 
 // parsInt64 converts a string to an int64, returning 0 if empty or in the case of error
