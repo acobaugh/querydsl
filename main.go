@@ -24,8 +24,9 @@ func main() {
 	password := flag.String("password", "", "DSL modem password")
 	flag.Parse()
 
-	numstats := []string{"Uptime", "SNRDS", "SNRUS", "AttDS", "AttUS", "PwrDS", "PwrUS", "AttainableDS", "AttainableUS", "RateDS", "RateUS"}
-	statsRe := regexp.MustCompile(`(?s).*?>Synchronized Time:</td><td colspan="2">(?P<Uptime>.+?)\&nbsp;</td>` +
+	numstats := []string{"Syncs", "Uptime", "SNRDS", "SNRUS", "AttDS", "AttUS", "PwrDS", "PwrUS", "AttainableDS", "AttainableUS", "RateDS", "RateUS"}
+	statsRe := regexp.MustCompile(`(?s).*?>Synchronized Time:</td><td colspan="2">(?P<Uptime>.+?)\&nbsp;</td>`+
+		`.*?Synchronizations:</td><td colspan="2">(?P<Syncs>\d+)` +
 		`.*?>SNR Margin \(0\.1 dB\):</td><td>(?P<SNRDS>.+?)</td><td>(?P<SNRUS>.+?)</td>` +
 		`.*?>Attenuation \(0\.1 dB\):</td><td>(?P<AttDS>.+?)</td><td>(?P<AttUS>.+?)</td>` +
 		`.*?>Output Power \(0\.1 dBm\):</td><td>(?P<PwrDS>.+?)</td><td>(?P<PwrUS>.+?)</td>` +
